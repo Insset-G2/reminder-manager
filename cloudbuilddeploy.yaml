@@ -1,0 +1,11 @@
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'reminder-manager'
+      - '--image=europe-west1-docker.pkg.dev/reminder-419107/repo/reminder-manager-py:latest'
+      - '--platform=managed'
+      - '--region=europe-west1'
+      - '--allow-unauthenticated' # Allow unauthenticated access to everyone
+      - '--port=5000' # Specify the container port
