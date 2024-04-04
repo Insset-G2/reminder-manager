@@ -32,7 +32,7 @@ def show():
 @app.route('/create', methods=['POST'])
 def create():
     description = request.form['description']
-    print(description)
+    print(request.form)
     # data = request.json
     # title = 'Rappel n°' + str(len(reminders) + 1)
     # description = data.get('description', 'TEST')
