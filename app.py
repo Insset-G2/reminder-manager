@@ -32,6 +32,7 @@ def show():
 @app.route('/create', methods=['POST'])
 def create():
     description = request.form['description']
+    title = request.form['title']
     print(request.form)
     # data = request.json
     # title = 'Rappel n°' + str(len(reminders) + 1)
@@ -40,7 +41,7 @@ def create():
     # reminder = Reminder(title, description, trigger_time)
     # reminders.append(reminder)
     # return jsonify(reminder.__dict__)
-    return redirect('/create-reminder')
+    return redirect('/')
 
 @app.route('/edit/<string:id>', methods=['PUT'])
 def edit(id):
