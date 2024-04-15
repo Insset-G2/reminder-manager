@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Créer un rappel</title>
 </head>
+
 <body>
     <h1>Créer un rappel</h1>
     <form action="/create" method="POST">
         <label for="description">Description :</label><br>
         <input type="text" id="description" name="description" required><br>
+        <label for="title">Titre :</label><br>
         <input type="text" id="title" name="title" required><br>
         <input type="submit" value="Créer le rappel">
     </form>

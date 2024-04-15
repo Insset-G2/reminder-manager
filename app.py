@@ -1,63 +1,150 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from datetime import datetime
 import uuid
+import mysql.connector
+import os
+import uuid
+from dotenv import load_dotenv
+import mariadb
+import json
 
 app = Flask(__name__)
+load_dotenv()
 
-reminders = []
+def get_db_connection():
+    try:
+        conn = mariadb.connect(
+            host='172.21.0.2',
+            port=3306,
+            user='reminder',
+            password='reminder',
+            database='reminder-manager'
+        )
+        return conn
+    except mariadb.Error as e:
+        print(f"Error connecting to MariaDB: {e}")
+        return None
 
-class Reminder:
-    def __init__(self, title, description, trigger_time):
-        self.id = str(uuid.uuid4())
-        self.title = title
-        self.description = description
-        self.trigger_time = trigger_time
+# Route pour récupérer tous les rappels
+@app.route('/api/test', methods=['GET'])
+def get_all_reminders():
+    conn = get_db_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM reminders")
+            reminders = cur.fetchall()
+            conn.close()
+            # Convertir les résultats en un format JSON
+            reminders_list = []
+            for reminder in reminders:
+                reminder_dict = {
+                    'id': reminder[0],
+                    'title': reminder[1],
+                    'description': reminder[2],
+                    'trigger_time': reminder[3].strftime("%Y-%m-%d %H:%M:%S")
+                }
+                reminders_list.append(reminder_dict)
+            return jsonify(reminders_list), 200
+        except mariadb.Error as e:
+            print(f"Error retrieving reminders: {e}")
+            return jsonify({"error": "Failed to retrieve reminders"}), 500
+    else:
+        return jsonify({"error": "Failed to connect to database"}), 500
 
 
 @app.route('/')
 def home():
     return render_template('create-reminder.html')
 
-@app.route('/create-reminder')
-def create_reminder_page():
-    return render_template('create-reminder.html')
-
-
-
-
-@app.route('/show', methods=['GET'])
-def show():
-    return jsonify([reminder.__dict__ for reminder in reminders])
-
-@app.route('/create', methods=['POST'])
-def create():
-    description = request.form['description']
-    title = request.form['title']
-    print(request.form)
-    # data = request.json
-    # title = 'Rappel n°' + str(len(reminders) + 1)
-    # description = data.get('description', 'TEST')
-    # trigger_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # reminder = Reminder(title, description, trigger_time)
-    # reminders.append(reminder)
-    # return jsonify(reminder.__dict__)
-    return redirect('/')
-
-@app.route('/edit/<string:id>', methods=['PUT'])
-def edit(id):
+# Route pour créer un rappel
+@app.route('/api/test', methods=['POST'])
+def create_reminder():
     data = request.json
-    for reminder in reminders:
-        if reminder.id == id:
-            reminder.description = data.get('description', 'TEST EDITED')
-            reminder.trigger_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            return jsonify(reminder.__dict__)
-    return jsonify({"error": "Reminder not found"}), 404
+    title = data.get('title')
+    description = data.get('description')
+    trigger_time = data.get('trigger_time')
 
-@app.route('/delete/<string:id>', methods=['DELETE'])
-def delete(id):
-    global reminders
-    reminders = [reminder for reminder in reminders if reminder.id != id]
-    return jsonify({"message": "Your reminder has been deleted successfully"})
+    conn = get_db_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("INSERT INTO reminders (title, description, trigger_time) VALUES (?, ?, ?)", (title, description, trigger_time))
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Reminder created successfully"}), 201
+        except mariadb.Error as e:
+            print(f"Error creating reminder: {e}")
+            return jsonify({"error": "Failed to create reminder"}), 500
+    else:
+        return jsonify({"error": "Failed to connect to database"}), 500
+    
+# Route pour mettre à jour un rappel
+@app.route('/api/test/<string:id>', methods=['PUT'])
+def update_reminder(id):
+    data = request.json
+    description = data.get('description')
+    trigger_time = data.get('trigger_time')
+
+    conn = get_db_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("UPDATE reminders SET description=?, trigger_time=? WHERE id=?", (description, trigger_time, id))
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Reminder updated successfully"}), 200
+        except mariadb.Error as e:
+            print(f"Error updating reminder: {e}")
+            return jsonify({"error": "Failed to update reminder"}), 500
+    else:
+        return jsonify({"error": "Failed to connect to database"}), 500
+
+# Route pour supprimer un rappel
+@app.route('/api/test/<string:id>', methods=['DELETE'])
+def delete_reminder(id):
+    conn = get_db_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM reminders WHERE id=?", (id,))
+            conn.commit()
+            conn.close()
+            return jsonify({"message": "Reminder deleted successfully"}), 200
+        except mariadb.Error as e:
+            print(f"Error deleting reminder: {e}")
+            return jsonify({"error": "Failed to delete reminder"}), 500
+    else:
+        return jsonify({"error": "Failed to connect to database"}), 500
+    
+
+@app.route('/api/test/<string:id>', methods=['GET'])
+def show(id):
+    # Récupérer les données du rappel correspondant dans la base de données
+    conn = get_db_connection()
+    if conn:
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM reminders WHERE id=?", (id,))
+            reminder = cur.fetchone()
+            conn.close()
+
+            # Vérifier si le rappel existe
+            if reminder:
+                reminder_dict = {
+                    'id': reminder[0],
+                    'title': reminder[1],
+                    'description': reminder[2],
+                    'trigger_time': reminder[3].strftime("%Y-%m-%d %H:%M:%S")
+                }
+                return jsonify(reminder_dict), 200
+            else:
+                return jsonify({"error": "Reminder not found"}), 404
+        except mariadb.Error as e:
+            print(f"Error retrieving reminder: {e}")
+            return jsonify({"error": "Failed to retrieve reminder"}), 500
+    else:
+        return jsonify({"error": "Failed to connect to database"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
