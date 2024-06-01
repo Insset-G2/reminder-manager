@@ -1,0 +1,49 @@
+body, html {
+    background-color: #EBECF0;
+  }
+  
+  body, p, input, select, textarea, button {
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: -0.2px;
+      font-size: 16px;
+  }
+  
+  div, p {
+    color: #BABECC;
+    text-shadow: 1px 1px 1px #FFF;
+  }
+  
+  form {
+    padding: 16px;
+    width: 320px; /* 16px * 20 */
+    margin: 0 auto;
+  }
+  
+  .segment {
+    padding: 32px 0; /* 16px * 2 */
+    text-align: center;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 24px; /* 16px * 1.5 */
+    width: 100%;
+  }
+  
+  .card {
+    padding: 1px 5px;
+    margin: 5px 8px 5px 0; /* 16px / 2 */
+    box-shadow: inset 2px 2px 5px #BABECC, inset -5px -5px 10px #FFF;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 15px; /* 16px * 20 */
+  }
+
+  .card > h3, p {
+    color: black;
+  }
+
+  

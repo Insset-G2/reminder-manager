@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/create-reminder.css') }}">
+
     <title>Créer un rappel</title>
 </head>
 
 <body>
-    <h1>Créer un rappel</h1>
-    <form action="/create" method="POST">
-        <label for="description">Description :</label><br>
-        <input type="text" id="description" name="description" required><br>
-        <label for="title">Titre :</label><br>
-        <input type="text" id="title" name="title" required><br>
-        <input type="submit" value="Créer le rappel">
+    <form action="api/create" method="POST" enctype="multipart/form-data">
+        
+        <div class="segment">
+            <h1>Créer un rappel</h1>
+        </div>
+        
+        <label>
+            <input type="text" id="title" name="title" placeholder="Titre" required />
+        </label>
+        <label>
+            <textarea id="description" name="description" placeholder="Description du rappel" rows="6" required></textarea>
+        </label>
+        <label>
+            <input type="datetime-local" id="trigger_time" name="trigger_time" placeholder="Date de rappel" min="{{ current_date_time }}" required />
+        </label>
+        
+        <button class="red" type="submit">Créer le rappel</button>
+        
     </form>
 </body>
+
 </html>

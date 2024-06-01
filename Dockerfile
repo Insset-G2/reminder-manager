@@ -8,6 +8,9 @@ WORKDIR /app
 COPY requirements.txt .
 COPY app.py .
 COPY templates templates
+COPY tests tests
+COPY static static
+
 
 # Installez les dépendances système nécessaires
 RUN apt-get update && apt-get install -y build-essential
@@ -20,7 +23,10 @@ RUN pip install --no-cache-dir \
     pymysql \
     mysql-connector-python \
     python-dotenv \
-    mariadb
+    mariadb \
+    apscheduler \
+    pytest \
+    flask-swagger-ui \
 
 # Exposez le port sur lequel l'application Flask fonctionne
 EXPOSE 5000
