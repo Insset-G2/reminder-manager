@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reminder.css') }}">
+    <title>Modifier un rappel</title>
+</head>
+<body>
+    <form id="updateReminderForm" action="/reminder/update/{{ reminder['id'] }}" method="POST" enctype="multipart/form-data">
+        <div class="segment">
+            <h1>Modifier un rappel</h1>
+        </div>
+        <label>
+            <input type="text" id="title" name="title" placeholder="Titre" value="{{ reminder['title'] }}" required />
+        </label>
+        <label>
+            <textarea id="description" name="description" placeholder="Description du rappel" rows="6" required>{{ reminder['description'] }}</textarea>
+        </label>
+        <label>
+            <input type="datetime-local" id="trigger_time" name="trigger_time" placeholder="Date de rappel" value="{{ reminder['trigger_time'] }}" min="{{ current_date_time }}" required />
+        </label>
+        <button class="red" type="submit">Mettre à jour le rappel</button>
+    </form>
+
+    <form id="deleteReminderForm" action="/reminder/delete/{{ reminder['id'] }}" method="POST">
+        <button class="red" type="submit">Supprimer le rappel</button>
+    </form>
+</body>
+</html>

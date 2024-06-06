@@ -8,9 +8,24 @@ WORKDIR /app
 COPY requirements.txt .
 COPY app.py .
 COPY templates templates
+COPY tests tests
+COPY static static
+
+
+# Installez les dépendances système nécessaires
+RUN apt-get update && apt-get install -y build-essential
+RUN apt-get update && apt-get install -y mariadb-client libmariadb-dev
 
 # Installez les dépendances Python
-RUN pip install --no-cache-dir Flask google-api-python-client
+RUN pip install --no-cache-dir \
+    Flask \
+    google-api-python-client \
+    pymysql \
+    mysql-connector-python \
+    python-dotenv \
+    mariadb \
+    pytest \
+    flask-swagger-ui
 
 # Exposez le port sur lequel l'application Flask fonctionne
 EXPOSE 5000

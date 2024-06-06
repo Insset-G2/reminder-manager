@@ -1,0 +1,168 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "API de gestion des rappels",
+      "description": "Une API pour créer, récupérer, mettre à jour et supprimer des rappels.",
+      "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+      "/reminders/current": {
+        "get": {
+          "summary": "Récupérer les rappels actuels",
+          "description": "Récupère les rappels dont l'heure de déclenchement est proche de l'heure actuelle.",
+          "responses": {
+            "200": {
+              "description": "Succès",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Reminder"
+                }
+              }
+            }
+          }
+        }
+      },
+      "/reminders/list": {
+        "get": {
+          "summary": "Récupérer tous les rappels",
+          "description": "Récupère tous les rappels enregistrés dans le système.",
+          "responses": {
+            "200": {
+              "description": "Succès",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Reminder"
+                }
+              }
+            }
+          }
+        }
+      },
+      "/reminder/create": {
+        "post": {
+          "summary": "Créer un rappel",
+          "description": "Crée un nouveau rappel avec les informations fournies.",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "description": "Informations du rappel à créer",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/ReminderInput"
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Rappel créé avec succès"
+            },
+            "500": {
+              "description": "Erreur interne du serveur"
+            }
+          }
+        }
+      },
+      "/reminder/update/{id}": {
+        "put": {
+          "summary": "Mettre à jour un rappel",
+          "description": "Met à jour un rappel existant avec les informations fournies.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID du rappel à mettre à jour",
+              "required": true,
+              "type": "integer"
+            },
+            {
+              "name": "body",
+              "in": "body",
+              "description": "Nouvelles informations du rappel",
+              "required": true,
+              "schema": {
+                "$ref": "#/definitions/ReminderInput"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Rappel mis à jour avec succès"
+            },
+            "500": {
+              "description": "Erreur interne du serveur"
+            }
+          }
+        }
+      },
+      "/reminder/delete/{id}": {
+        "delete": {
+          "summary": "Supprimer un rappel",
+          "description": "Supprime un rappel existant avec l'ID fourni.",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "description": "ID du rappel à supprimer",
+              "required": true,
+              "type": "integer"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Rappel supprimé avec succès"
+            },
+            "500": {
+              "description": "Erreur interne du serveur"
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "Reminder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "trigger_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReminderInput": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "trigger_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["user_id", "title", "trigger_time"]
+      }
+    }
+  }
+  

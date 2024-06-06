@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/card-reminder.css') }}">
+
+    <title>Afficher un rappel</title>
+</head>
+
+<body>
+    <form>
+
+        <div class="card">
+            <h3>{{ reminder.title }}</h3>
+            <p><strong>Description :</strong> {{ reminder.description }}</p>
+            <p><strong>Heure de rappel :</strong> {{ reminder.trigger_time }}</p>
+        </div>
+        
+    </form>
+</body>
+
+</html>
