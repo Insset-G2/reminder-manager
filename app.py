@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_swagger_ui import get_swaggerui_blueprint
-from datetime import datetime
-from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
 import uuid
 import mysql.connector
 import os
@@ -96,28 +95,44 @@ def create_user():
 
 #################################################################################
 
-
-def get_due_reminders():
-    print("Executing get_due_reminders function...")
+@app.route('/reminders/current', methods=['GET'])
+def get_current_reminders():
+    print("Executing function...")
     conn = get_db_connection()
     if conn:
         try:
             cur = conn.cursor()
-            # Sélectionnez les rappels dont l'heure de déclenchement est antérieure ou égale à l'heure actuelle
+            # Sélectionnez les rappels dont l'heure de déclenchement est égale à l'heure actuelle
             
-            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            cur.execute("SELECT * FROM reminders WHERE trigger_time = ?", (current_time,))
+            # current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            current_time = datetime.now() + timedelta(hours=2)
+            
+            lower_bound = (current_time - timedelta(seconds=0)).strftime('%Y-%m-%d %H:%M:%S')
+            upper_bound = (current_time + timedelta(seconds=60)).strftime('%Y-%m-%d %H:%M:%S')
+            
+            cur.execute("SELECT * FROM reminders WHERE trigger_time BETWEEN ? AND ?", (lower_bound, upper_bound))
             due_reminders = cur.fetchall()
 
-            # Renvoyez les rappels en tant que réponse JSON
-            return jsonify(due_reminders)
+            reminders_list = []
+            for reminder in due_reminders:
+                reminders_dict = {
+                    'id': reminder[0],
+                    'user_id': reminder[1],
+                    'title': reminder[2],
+                    'description': reminder[3],
+                    'trigger_time': reminder[4].strftime("%Y-%m-%d %H:%M:%S"),
+                }
+                reminders_list.append(reminders_dict)
+                
+            return jsonify(reminders_list)
         except mariadb.Error as e:
             print(f"Error retrieving due reminders: {e}")
         finally:
             conn.close()
 
+
 # Route pour récupérer tous les rappels
-@app.route('/api/list', methods=['GET'])
+@app.route('/reminders/list', methods=['GET'])
 def get_all_reminders():
     conn = get_db_connection()
     if conn:
@@ -152,9 +167,31 @@ def home():
     current_date_time = datetime.now().strftime('%Y-%m-%dT%H:%M')
     return render_template('create-reminder.html', current_date_time=current_date_time)
 
+@app.route('/update/<string:id>')
+def updateReminder(id):
+    reminder_data = get(id)
+
+    current_date_time = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    
+    if reminder_data:
+        # Créer un dictionnaire contenant les données du rappel
+        reminder = {
+            'id': id,
+            'title': reminder_data['title'],
+            'description': reminder_data['description'],
+            'trigger_time': reminder_data['trigger_time']
+        }
+        
+        # Formater la date avant de passer à la vue
+        reminder['trigger_time'] = datetime.strptime(reminder['trigger_time'], '%Y-%m-%dT%H:%M:%S').strftime('%Y-%m-%dT%H:%M')
+        
+        return render_template('update-reminder.html', reminder=reminder, current_date_time=current_date_time)
+    else:
+        return jsonify({"error": "Reminder not found"}), 404
+
 @app.route('/get/<string:id>')
 def getReminder(id):
-    reminder = show(id)
+    reminder = get(id)
     if reminder:
         return render_template('reminder.html', reminder=reminder)
     else:
@@ -162,7 +199,7 @@ def getReminder(id):
 
 
 # Route pour créer un rappel
-@app.route('/api/create', methods=['POST'])
+@app.route('/reminder/create', methods=['POST'])
 def create_reminder():
     data = request.form
     user_id = data.get('user_id')
@@ -185,17 +222,18 @@ def create_reminder():
         return jsonify({"error": "Failed to connect to database"}), 500
     
 # Route pour mettre à jour un rappel
-@app.route('/api/test/<string:id>', methods=['PUT'])
+@app.route('/reminder/update/<string:id>', methods=['POST'])
 def update_reminder(id):
-    data = request.json
+    data = request.form
     description = data.get('description')
     trigger_time = data.get('trigger_time')
+    title = data.get('title')
 
     conn = get_db_connection()
     if conn:
         try:
             cur = conn.cursor()
-            cur.execute("UPDATE reminders SET description=?, trigger_time=? WHERE id=?", (description, trigger_time, id))
+            cur.execute("UPDATE reminders SET description=?, trigger_time=?, title=? WHERE id=?", (description, trigger_time, title, id))
             conn.commit()
             conn.close()
             return jsonify({"message": "Reminder updated successfully"}), 200
@@ -206,7 +244,7 @@ def update_reminder(id):
         return jsonify({"error": "Failed to connect to database"}), 500
 
 # Route pour supprimer un rappel
-@app.route('/api/test/<string:id>', methods=['DELETE'])
+@app.route('/reminder/delete/<string:id>', methods=['POST'])
 def delete_reminder(id):
     conn = get_db_connection()
     if conn:
@@ -223,8 +261,8 @@ def delete_reminder(id):
         return jsonify({"error": "Failed to connect to database"}), 500
     
 
-@app.route('/api/test/<string:id>', methods=['GET'])
-def show(id):
+@app.route('/reminder/get/<string:id>', methods=['GET'])
+def get(id):
     # Récupérer les données du rappel correspondant dans la base de données
     conn = get_db_connection()
     if conn:
@@ -247,16 +285,6 @@ def show(id):
 
 if __name__ == '__main__':
     print("Starting the application...")
+
     app.run(host='0.0.0.0', port=5000, debug=True)
 
-    # Configurer le planificateur de tâches
-    scheduler = BackgroundScheduler()
-
-    # Définir la fonction à exécuter toutes les minutes
-    scheduler.add_job(get_due_reminders, 'interval', minutes=1)
-
-    print("Starting the scheduler...")
-    # Démarrer le planificateur
-    scheduler.start()
-    
-    print("Scheduler started.")

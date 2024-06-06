@@ -24,9 +24,8 @@ RUN pip install --no-cache-dir \
     mysql-connector-python \
     python-dotenv \
     mariadb \
-    apscheduler \
     pytest \
-    flask-swagger-ui \
+    flask-swagger-ui
 
 # Exposez le port sur lequel l'application Flask fonctionne
 EXPOSE 5000
