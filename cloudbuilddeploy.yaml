@@ -3,7 +3,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'reminder-manager'
+      - 'reminder-manager-py'
       - '--image=europe-west1-docker.pkg.dev/reminder-419107/repo/reminder-manager-py:latest'
       - '--platform=managed'
       - '--region=europe-west1'
