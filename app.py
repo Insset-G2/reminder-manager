@@ -73,7 +73,7 @@ import mariadb
     
 # @app.route('/api/user', methods=['POST'])
 # def create_user():
-#     data = request.form
+#     data = request.json
 #     username = data.get('username')
     
 #     conn = get_db_connection()
@@ -201,7 +201,7 @@ import mariadb
 # # Route pour créer un rappel
 # @app.route('/reminder/create', methods=['POST'])
 # def create_reminder():
-#     data = request.form
+#     data = request.json
 #     user_id = data.get('user_id')
 #     title = data.get('title')
 #     description = data.get('description')
@@ -224,7 +224,7 @@ import mariadb
 # # Route pour mettre à jour un rappel
 # @app.route('/reminder/update/<string:id>', methods=['POST'])
 # def update_reminder(id):
-#     data = request.form
+#     data = request.json
 #     description = data.get('description')
 #     trigger_time = data.get('trigger_time')
 #     title = data.get('title')
@@ -323,7 +323,7 @@ def get_all_users():
     
 @app.route('/api/user', methods=['POST'])
 def create_user():
-    data = request.form
+    data = request.json
     username = data.get('username')
     user_id = str(uuid.uuid4())
     
@@ -379,7 +379,7 @@ def home():
 
 @app.route('/reminder/create', methods=['POST'])
 def create_reminder():
-    data = request.form
+    data = request.json
     reminder_id = str(uuid.uuid4())
     user_id = data.get('user_id')
     title = data.get('title')
@@ -399,7 +399,7 @@ def create_reminder():
 
 @app.route('/reminder/update/<string:id>', methods=['PUT'])
 def update_reminder(id):
-    data = request.form
+    data = request.json
     description = data.get('description')
     trigger_time = data.get('trigger_time')
     title = data.get('title')
