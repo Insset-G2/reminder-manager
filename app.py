@@ -358,16 +358,16 @@ def get_all_reminders():
 def home():
     return redirect(SWAGGER_URL)
 
-@app.route('/update/<string:id>')
-def updateReminder(id):
-    reminder_data = get_reminder(id)
+# @app.route('/update/<string:id>')
+# def updateReminder(id):
+#     reminder_data = get_reminder(id)
     
-    if reminder_data:
-        reminder_data['trigger_time'] = datetime.strptime(reminder_data['trigger_time'], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%dT%H:%M')
-        current_date_time = datetime.now().strftime('%Y-%m-%dT%H:%M')
-        return render_template('update-reminder.html', reminder=reminder_data, current_date_time=current_date_time)
-    else:
-        return jsonify({"error": "Reminder not found"}), 404
+#     if reminder_data:
+#         reminder_data['trigger_time'] = datetime.strptime(reminder_data['trigger_time'], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%dT%H:%M')
+#         current_date_time = datetime.now().strftime('%Y-%m-%dT%H:%M')
+#         return render_template('update-reminder.html', reminder=reminder_data, current_date_time=current_date_time)
+#     else:
+#         return jsonify({"error": "Reminder not found"}), 404
 
 # @app.route('/get/<string:id>')
 # def getReminder(id):
