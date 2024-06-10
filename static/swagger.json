@@ -191,7 +191,11 @@
         },
         "email": {
           "type": "string"
+        },
+        "champ-test": {
+          "type": "string"
         }
+
       }
     },
     "ReminderInput": {
