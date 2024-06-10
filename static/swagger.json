@@ -20,6 +20,9 @@
                 "$ref": "#/definitions/Reminder"
               }
             }
+          },
+          "500": {
+            "description": "Erreur interne du serveur"
           }
         }
       }
@@ -37,6 +40,9 @@
                 "$ref": "#/definitions/Reminder"
               }
             }
+          },
+          "500": {
+            "description": "Erreur interne du serveur"
           }
         }
       }
@@ -58,7 +64,10 @@
         ],
         "responses": {
           "201": {
-            "description": "Rappel créé avec succès"
+            "description": "Rappel créé avec succès",
+            "schema": {
+              "$ref": "#/definitions/Reminder"
+            }
           },
           "500": {
             "description": "Erreur interne du serveur"
@@ -90,7 +99,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Rappel mis à jour avec succès"
+            "description": "Rappel mis à jour avec succès",
+            "schema": {
+              "$ref": "#/definitions/Reminder"
+            }
+          },
+          "404": {
+            "description": "Rappel non trouvé"
           },
           "500": {
             "description": "Erreur interne du serveur"
@@ -115,6 +130,38 @@
           "200": {
             "description": "Rappel supprimé avec succès"
           },
+          "404": {
+            "description": "Rappel non trouvé"
+          },
+          "500": {
+            "description": "Erreur interne du serveur"
+          }
+        }
+      }
+    },
+    "/reminder/get/{id}": {
+      "get": {
+        "summary": "Récupérer un rappel",
+        "description": "Récupère un rappel existant avec l'ID fourni.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID du rappel à récupérer",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succès",
+            "schema": {
+              "$ref": "#/definitions/Reminder"
+            }
+          },
+          "404": {
+            "description": "Rappel non trouvé"
+          },
           "500": {
             "description": "Erreur interne du serveur"
           }
@@ -130,7 +177,7 @@
           "type": "string"
         },
         "user_id": {
-          "type": "integer"
+          "type": "string"
         },
         "title": {
           "type": "string"
@@ -141,6 +188,9 @@
         "trigger_time": {
           "type": "string",
           "format": "date-time"
+        },
+        "email": {
+          "type": "string"
         }
       }
     },
@@ -148,7 +198,7 @@
       "type": "object",
       "properties": {
         "user_id": {
-          "type": "integer"
+          "type": "string"
         },
         "title": {
           "type": "string"
@@ -159,6 +209,9 @@
         "trigger_time": {
           "type": "string",
           "format": "date-time"
+        },
+        "email": {
+          "type": "string"
         }
       },
       "required": ["user_id", "title", "trigger_time"]
