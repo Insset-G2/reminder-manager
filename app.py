@@ -385,6 +385,7 @@ def create_reminder():
     title = data.get('title')
     description = data.get('description')
     trigger_time = data.get('trigger_time')
+    email = data.get('email')
     
     reminder = {
         'id': reminder_id,
@@ -392,10 +393,11 @@ def create_reminder():
         'title': title,
         'description': description,
         'trigger_time': trigger_time,
+        'email': email
     }
     reminders.append(reminder)
     
-    return jsonify({"message": "Reminder created successfully"}), 201
+    return jsonify({"message": "Reminder created successfully", "reminder": reminder}), 201
 
 @app.route('/reminder/update/<string:id>', methods=['PUT'])
 def update_reminder(id):
@@ -403,12 +405,14 @@ def update_reminder(id):
     description = data.get('description')
     trigger_time = data.get('trigger_time')
     title = data.get('title')
+    email = data.get('email')
     
     reminder = get_reminder(id)
     if reminder:
         reminder['description'] = description
         reminder['trigger_time'] = trigger_time
         reminder['title'] = title
+        reminder['email'] = email
         return jsonify({"message": "Reminder updated successfully"}), 200
     else:
         return jsonify({"error": "Reminder not found"}), 404
