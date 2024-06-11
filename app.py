@@ -296,6 +296,7 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_swagger_ui import get_swaggerui_blueprint
 from datetime import datetime, timedelta
 import uuid
+import requests
 
 app = Flask(__name__)
 
@@ -396,6 +397,8 @@ def create_reminder():
         'email': email
     }
     reminders.append(reminder)
+
+    sendMailForCreatingReminder(reminder)
     
     return jsonify({"message": "Reminder created successfully", "reminder": reminder}), 201
 
@@ -429,6 +432,21 @@ def get_reminder(id):
         if reminder['id'] == id:
             return reminder
     return jsonify({"error": "Reminder not found"}), 404
+
+
+def sendMailForCreatingReminder(reminder):
+    email_data = {
+        'to': reminder['email'],
+        'subject': reminder['title'],
+        'message': 'Vous venez de créer un rappel'
+    }
+    try:
+        response = requests.post('https://onzecord-mail-ynl52tk6za-ey.a.run.app/send_email', json=email_data)
+        response.raise_for_status()
+        print("Email sent successfully.")
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to send email: {e}")
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
